@@ -9,11 +9,12 @@ export default function Page404({ locale, locales, defaultLocale }) {
 }
 
 export async function getStaticProps({ locale, locales, defaultLocale }) {
+  // ✅ 念のためシリアライズ処理を追加
   return {
     props: {
-      locale,
-      locales,
-      defaultLocale,
+      locale: locale,
+      locales: JSON.parse(JSON.stringify(locales)),
+      defaultLocale: defaultLocale,
     },
   };
 }
