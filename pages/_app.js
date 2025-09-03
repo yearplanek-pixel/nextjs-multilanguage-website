@@ -1,6 +1,7 @@
 import "../styles/tailwind.css";
 import { storyblokInit, apiPlugin } from "@storyblok/react";
 
+// コンポーネントのインポート
 import BlogPost from "../components/BlogPost";
 import Feature from "../components/Feature";
 import FeaturedPosts from "../components/FeaturedPosts";
@@ -21,17 +22,29 @@ const components = {
   text: Text,
 };
 
+// 環境変数からトークンを取得
+const storyblokToken = process.env.NEXT_PUBLIC_STORYBLOK_TOKEN || process.env.STORYBLOK_TOKEN;
+
 storyblokInit({
-  accessToken: "YOUR_PREVIEW_TOKEN",
+  accessToken: storyblokToken,
   use: [apiPlugin],
   components,
 });
 
+// 安全なシリアライズ関数
+const safePageProps = (pageProps) => {
+  if (!pageProps) return {};
+  try {
+    return JSON.parse(JSON.stringify(pageProps));
+  } catch (error) {
+    console.warn("Page props serialization error:", error);
+    return {};
+  }
+};
+
 function MyApp({ Component, pageProps }) {
-  // ✅ pagePropsに循環参照がある可能性を解消
-  const safePageProps = pageProps ? JSON.parse(JSON.stringify(pageProps)) : {};
-  
-  return <Component {...safePageProps} />;
+  const processedProps = safePageProps(pageProps);
+  return <Component {...processedProps} />;
 }
 
 export default MyApp;
