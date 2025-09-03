@@ -34,10 +34,13 @@ export async function getStaticProps({
 
   let { data } = await getStoryblokApi().get(`cdn/stories/${slug}`, sbParams);
 
+  // ✅ 循環参照を解消
+  const serializedData = data ? JSON.parse(JSON.stringify(data)) : null;
+
   return {
     props: {
-      story: data ? data.story : false,
-      key: data ? data.story.id : false,
+      story: serializedData ? serializedData.story : false,
+      key: serializedData ? serializedData.story.id : false,
       locale,
       locales,
       defaultLocale,
@@ -49,14 +52,17 @@ export async function getStaticProps({
 export async function getStaticPaths({ locales }) {
   let { data } = await getStoryblokApi().get("cdn/links/");
 
+  // ✅ 循環参照を解消
+  const serializedData = JSON.parse(JSON.stringify(data));
+
   let paths = [];
-  Object.keys(data.links).forEach((linkKey) => {
-    if (data.links[linkKey].is_folder) {
+  Object.keys(serializedData.links).forEach((linkKey) => {
+    if (serializedData.links[linkKey].is_folder) {
       return;
     }
 
     // get array for slug because of catch all
-    const slug = data.links[linkKey].slug;
+    const slug = serializedData.links[linkKey].slug;
     let splittedSlug = slug.split("/");
     if (slug === "home") splittedSlug = false;
 
