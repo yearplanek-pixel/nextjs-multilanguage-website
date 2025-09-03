@@ -28,7 +28,10 @@ storyblokInit({
 });
 
 function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  // ✅ pagePropsに循環参照がある可能性を解消
+  const safePageProps = pageProps ? JSON.parse(JSON.stringify(pageProps)) : {};
+  
+  return <Component {...safePageProps} />;
 }
 
 export default MyApp;
